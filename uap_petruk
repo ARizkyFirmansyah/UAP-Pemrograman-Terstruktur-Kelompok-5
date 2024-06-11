@@ -1,1 +1,280 @@
+// jika kakak nya membaca, kami ngerjain nya betiga di 1 laptop sampe minep ka, jadi jangan salah paham ya. soalnya laptop yg laen buat yt sama gpt kak hehe lopyu kak
 
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <ctime>
+#include <cstdlib>
+#include <ncurses/ncurses.h>
+#include <windows.h>
+#include <queue>
+#include <algorithm>
+#include <windows.h>
+
+using namespace std;
+
+// Struktur untuk menyimpan data film
+struct Film {
+    string judul;
+    string waktuTayang;
+    int hargaTiket;
+};
+
+// Struktur untuk menyimpan data pengguna
+struct Pengguna {
+    string namaPengguna;
+    string kataSandi;
+};
+
+// Struktur untuk menyimpan data kursi
+struct Kursi {
+    int nomorKursi;
+    bool tersedia;
+};
+
+// Kelas untuk mengelola bioskop
+class Bioskop {
+public:
+    vector<Film> film;
+    vector<Pengguna> pengguna;
+    vector<Kursi> kursi;
+    queue<int> antrianKursi;
+
+    // Menambahkan film baru
+    void tambahFilm(Film f) {
+        film.push_back(f);
+    }
+
+    // Menampilkan jadwal film
+    void tampilkanJadwalFilm() {
+        cout << "Jadwal Film:" << endl;
+        for (int i = 0; i < film.size(); i++) {
+            cout << i + 1 << ": " << film[i].judul << " - " << film[i].waktuTayang << endl;
+        }
+    }
+
+    // Membuat akun pengguna baru
+    void buatAkunPengguna(Pengguna p) {
+        pengguna.push_back(p);
+    }
+
+    // Login pengguna
+    bool loginPengguna(string namaPengguna, string kataSandi) {
+        for (int i = 0; i < pengguna.size(); i++) {
+            if (pengguna[i].namaPengguna == namaPengguna && pengguna[i].kataSandi == kataSandi) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Memilih kursi
+    void pilihKursi(int nomorKursi) {
+        for (int i = 0; i < kursi.size(); i++) {
+            if (kursi[i].nomorKursi == nomorKursi) {
+                kursi[i].tersedia = false;
+                antrianKursi.push(nomorKursi);
+                break;
+            }
+        }
+    }
+
+    // Membuat pemesanan tiket
+    void pesanTiket(string namaPengguna, int nomorKursi, Film f) {
+        cout << "Pemesanan tiket berhasil!" << endl;
+        cout << "Nama Pengguna: " << namaPengguna << endl;
+        cout << "Nomor Kursi: " << nomorKursi << endl;
+        cout << "Film: " << f.judul << " - " << f.waktuTayang << endl;
+        cout << "Harga Tiket: " << f.hargaTiket << endl;
+        
+        cout << "\n\nMohon Tunggu, Tiket Sedang Dicetak\n";
+        for(int i = 0;i <= 50; i++){
+        	cout << ">>";
+        	Sleep(500);
+		}
+    }
+
+    //Menampilkan tiket bioskop
+    void tampilkanTiket(string namaPengguna, int nomorKursi, Film f) {
+	initscr(); // Initialize ncurses
+	    clear(); // Clear the screen
+	
+	    // Print the header
+	    attron(A_BOLD);
+	    mvprintw(0, 0, "Tiket Bioskop");
+	    attroff(A_BOLD);
+	    mvprintw(1, 0, "-------------------");
+	
+	    // Print the details
+	    mvprintw(2, 0, "Nama Pengguna: %s", namaPengguna.c_str());
+	    mvprintw(3, 0, "Nomor Kursi: %d", nomorKursi);
+	    mvprintw(4, 0, "Film: %s - %s", f.judul.c_str(), f.waktuTayang.c_str());
+	    mvprintw(5, 0, "Harga Tiket: %d", f.hargaTiket);
+	
+	    // Print the barcode
+	    mvprintw(6, 0, "Barcode:\n");
+	    for (int i = 0; i < 10; i++) {
+	        for (int j = 0; j < 25; j++) {
+	            if (rand() % 2 == 0) {
+	                addch('#');
+	            } else {
+	                addch(' ');
+	            }
+	        }
+	        addch('\n');
+	    }
+	
+	    refresh(); // Update the screen
+	    getch(); // Wait for a key press
+	    endwin(); // Clean up
+    }
+
+
+
+
+    // Sorting films by title
+    void sortFilms() {
+        sort(film.begin(), film.end(), [](const Film& a, const Film& b) {
+            return a.judul < b.judul;
+        });
+    }
+
+    // Binary search for a film by title
+    int binarySearchFilm(string judul) {
+        int left = 0;
+        int right = film.size() - 1;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (film[mid].judul == judul) {
+                return mid;
+            } else if (film[mid].judul < judul) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        return -1;
+    }
+
+    // Queue implementation for antrian kursi
+    void enqueueKursi(int nomorKursi) {
+        antrianKursi.push(nomorKursi);
+    }
+
+    int dequeueKursi() {
+        if (antrianKursi.empty()) {
+            return -1;
+        }
+        int nomorKursi = antrianKursi.front();
+        antrianKursi.pop();
+        return nomorKursi;
+    }
+
+};
+
+int main() {
+	
+	ifstream myfile;
+	char sv_text;
+	
+	myfile.open("bggr.txt", ios::app);
+	
+	if(!myfile.fail()){
+		
+		while(!myfile.eof()){
+			myfile.get(sv_text);
+			cout << sv_text;
+		}
+		myfile.close();
+	}
+	Sleep(2000);
+	endwin();
+	refresh();
+	
+    Bioskop bioskop;
+
+    Film film1 = {"365 Days", "13:00", 50000};
+    Film film2 = {"After We Fell", "15:00", 30000};
+    Film film3 = {"Love2015", "17:00", 30000};
+    Film film4 = {"Nymphomaniac: Vol. I", "19:00", 35000};
+    Film film5 = {"Amar", "21:00", 35000};
+    bioskop.tambahFilm(film1);
+    bioskop.tambahFilm(film2);
+    bioskop.tambahFilm(film3);
+    bioskop.tambahFilm(film4);
+    bioskop.tambahFilm(film5);
+
+    string namaPengguna, kataSandi;
+    
+    cout << "\nSelamat Datang\n====================";
+    cout << "\nBuat Akun \n";
+    cout << "Masukkan Nama :";
+    cin >> namaPengguna;
+    cout << "Masukkan Password :";
+    cin >> kataSandi;
+    Pengguna pengguna = {namaPengguna, kataSandi};
+    cout << "Pendaftaran Berhasil\n\n";
+    bioskop.buatAkunPengguna(pengguna);
+    
+    cout << "Login Pengguna" << endl;
+    cout << "Nama Pengguna: ";
+    cin >> namaPengguna;
+    cout << "Kata Sandi: ";
+    cin >> kataSandi;
+
+    if (bioskop.loginPengguna(namaPengguna, kataSandi)) {
+        cout << "Login berhasil. \n\n\n\n" << endl;
+
+        // Menampilkan jadwal film
+        bioskop.tampilkanJadwalFilm();
+
+        // Sorting films by title
+        bioskop.sortFilms();
+        cout << "Jadwal Film (sorted by title):" << endl;
+        for (int i = 0; i < bioskop.film.size(); i++) {
+            cout << "Film " << i + 1 << ": " << bioskop.film[i].judul << " - " << bioskop.film[i].waktuTayang << endl;
+        }
+
+        // Binary search for a film by title
+        string judulFilm;
+        cout << "Cari film berdasarkan judul: ";
+        cin >> judulFilm;
+        int index = bioskop.binarySearchFilm(judulFilm);
+        if (index != -1) {
+            cout << "Film found: " << bioskop.film[index].judul << " - " << bioskop.film[index].waktuTayang << endl;
+        } else {
+            cout << "Film not found." << endl;
+        }
+
+        // Memilih film dan waktu tayang
+        int pilihanFilm;
+        cout << "Pilih film: ";
+        cin >> pilihanFilm;
+        Film filmPilihan = bioskop.film[pilihanFilm - 1];
+
+               // Memilih kursi
+        int nomorKursi;
+        cout << "Pilih kursi: ";
+        cin >> nomorKursi;
+        bioskop.pilihKursi(nomorKursi);
+        cout << "\n\n";
+
+        // Membuat pemesanan tiket
+        bioskop.pesanTiket(namaPengguna, nomorKursi, filmPilihan);
+
+        // Menampilkan tiket bioskop
+        bioskop.tampilkanTiket(namaPengguna, nomorKursi, filmPilihan);
+
+        // Queue implementation for antrian kursi
+        cout << "Antrian Kursi:" << endl;
+        while (!bioskop.antrianKursi.empty()) {
+            int nomorKursi = bioskop.dequeueKursi();
+            cout << "Nomor Kursi: " << nomorKursi << endl;
+        }
+    } else {
+        cout << "Login gagal." << endl;
+    }
+
+    	return 0;
+}
